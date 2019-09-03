@@ -10,19 +10,12 @@ from requests.auth import HTTPBasicAuth
 
 VAULT_ADDRESS =  os.environ.get('VAULT_ADDR', None)
 VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
-
-
-namespace = ""
-
-
-   
-if namespace:
-    namespace+"/"   
-
+VAULT_NAMESPACE =  os.environ.get('VAULT_NAMESPACE', "")
 
 client = hvac.Client(
     url=VAULT_ADDRESS,
     token=VAULT_TOKEN,
+    namespace=VAULT_NAMESPACE
     #verify=False,
     )
 
@@ -39,7 +32,7 @@ def mapKVPoliciesCGs():
  for policy in policyList:
      data = getKVGroupMapping(policy)
      policyMap = update(policyMap, data)
- print (policyMap)
+ return policyMap
 
 
 def listPolicies():
@@ -54,15 +47,15 @@ def getKVGroupMapping(policy):
         obj = hcl.loads(hvac_policy_rules)
         # print(json.dumps(obj,indent=4))
         for path in obj['path']:
-            # print(json.dumps(obj['path'][path],indent=4)) 
+            # print(json.dumps(obj['path'][path],indent=4))
             if "control_group" in obj['path'][path]:
-                # print(path) 
+                # print(path)
                 # if not path in data.keys():
                 data[path] = []
                 # print(path)
-                factors = obj['path'][path]['control_group']['factor']                
+                factors = obj['path'][path]['control_group']['factor']
 
-                 
+
                 # print(json.dumps(obj['path'][path]['control_group']['factor'],indent=4))
                 # print(json.dumps(factors,indent=4))
 
@@ -79,16 +72,33 @@ def getKVGroupMapping(policy):
                             data[path] += factor[item]['identity']['group_names']
 
                 data[path] = set (data[path])
-                            
 
-                
     except:
         pass
     return data
 
+def set_default(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    raise TypeError
+
+
+def writeIntoVault (policyMap):
+    # print(policyMap)
+    policyMapsecret = json.dumps(policyMap,default=set_default)
+    client.secrets.kv.v2.create_or_update_secret(
+    mount_point='_notifier_data',
+    path='control_group_kvMapping',
+    secret=dict(policyMapsecret=policyMapsecret))
+    # pass
+
 
 def main():
-    mapKVPoliciesCGs()
+    # build policy map
+    policyMap = mapKVPoliciesCGs()
+    # print (policyMap)
+    # write into vault
+    writeIntoVault(policyMap)
     #getApproverGroupEntities(management_group)
 
 if __name__ == '__main__':
