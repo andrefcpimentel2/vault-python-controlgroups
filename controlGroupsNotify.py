@@ -8,19 +8,13 @@ from optparse import OptionParser
 from requests.auth import HTTPBasicAuth
 
 VAULT_ADDRESS =  os.environ.get('VAULT_ADDR', None)
-VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
-
-
-namespace = ""
-
-
-   
-if namespace:
-    namespace+"/"   
+VAULT_TOKEN = os.environ.get('VAULT_TOKEN', None)
+VAULT_NAMESPACE =  os.environ.get('VAULT_NAMESPACE', "/")
 
 client = hvac.Client(
     url=VAULT_ADDRESS,
     token=VAULT_TOKEN,
+    namespace=VAULT_NAMESPACE
     #verify=False,
     )
 
@@ -40,7 +34,7 @@ def readTokenAccessor():
 
         # print("The response contains {0} properties".format(len(jData)))
         # print("\n")
-        
+
         # print(json.dumps(jData,indent=2))
     else:
         response.raise_for_status()
@@ -76,7 +70,7 @@ def getRequestInfo(acessor):
             getEntityRequestinfo(jData['data']['request_entity']['name'])
             # getPoliciesFromKVPath(jData['data']['request_path'])
             #getEntitybyID(jData['data']['request_entity']['id'], jData['data']['request_path'])
-            
+
 
     else:
         response.raise_for_status()
@@ -87,8 +81,8 @@ def getEntityRequestinfo(entityName):
         name=entityName,)
     print(read_response['data']['policies'])
     return read_response['data']['policies']
-    
-    
+
+
 
 # def getPoliciesFromKVPath(kvpath):
 #     print(kvpath)
@@ -103,7 +97,7 @@ def getEntityRequestinfo(entityName):
 #     for entityID in lookup_response['data']['member_entity_ids']:
 #         getEntityAlias(entityID)
 
-     
+
 # def getEntityAlias(entityID):
 
 #     read_response = client.secrets.identity.read_entity(
@@ -116,7 +110,7 @@ def getEntityRequestinfo(entityName):
 #     elif read_response['data']['aliases'][0]['mount_type'] == "github":
 #         name = read_response['data']['aliases'][0]['name']
 #         email = findEmailFromGitHubUsername(name)
-    
+
 #     print('Name for entity ID {id} is: {name}'.format(id=entityID, name=name))
 #     return name
 
