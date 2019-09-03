@@ -10,8 +10,7 @@ from requests.auth import HTTPBasicAuth
 
 # VAULT_ADDRESS =  os.environ.get('VAULT_ADDR', None)
 # VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
-VAULT_ADDRESS = "https://vault.eu-guystack.hashidemos.io:8200"
-VAULT_TOKEN = "s.KJd3cXx9maSEa1ofKij9kxFp"
+
 
 namespace = ""
 
