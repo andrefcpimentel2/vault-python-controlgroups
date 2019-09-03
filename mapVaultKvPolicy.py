@@ -8,8 +8,8 @@ import hcl
 from optparse import OptionParser
 from requests.auth import HTTPBasicAuth
 
-# VAULT_ADDRESS =  os.environ.get('VAULT_ADDR', None)
-# VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
+VAULT_ADDRESS =  os.environ.get('VAULT_ADDR', None)
+VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
 
 
 namespace = ""
