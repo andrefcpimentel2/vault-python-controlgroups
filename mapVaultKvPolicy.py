@@ -10,16 +10,17 @@ from requests.auth import HTTPBasicAuth
 
 VAULT_ADDRESS =  os.environ.get('VAULT_ADDR', None)
 VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
-VAULT_NAMESPACE =  os.environ.get('VAULT_NAMESPACE', "")
+namespace = ""
+if namespace:
+    namespace+"/"
 
 client = hvac.Client(
     url=VAULT_ADDRESS,
     token=VAULT_TOKEN,
-    namespace=VAULT_NAMESPACE
     #verify=False,
     )
 
-def update(d1,d2):
+def update_dict(d1,d2):
     c = d1.copy()
     for key in d2:
         if key in d1:c[key].update(d2[key])
@@ -27,12 +28,12 @@ def update(d1,d2):
     return c
 
 def mapKVPoliciesCGs():
- policyList = listPolicies()
- policyMap = {}
- for policy in policyList:
-     data = getKVGroupMapping(policy)
-     policyMap = update(policyMap, data)
- return policyMap
+    policyList = listPolicies()
+    policyMap = {}
+    for policy in policyList:
+        data = getKVGroupMapping(policy)
+        policyMap = update_dict(policyMap, data)
+    return policyMap
 
 
 def listPolicies():
@@ -72,33 +73,18 @@ def getKVGroupMapping(policy):
                             data[path] += factor[item]['identity']['group_names']
 
                 data[path] = set (data[path])
+                data[path] = list (data[path])
+
+
+
 
     except:
         pass
     return data
 
-def set_default(obj):
-    if isinstance(obj, set):
-        return list(obj)
-    raise TypeError
-
-
-def writeIntoVault (policyMap):
-    # print(policyMap)
-    policyMapsecret = json.dumps(policyMap,default=set_default)
-    client.secrets.kv.v2.create_or_update_secret(
-    mount_point='_notifier_data',
-    path='control_group_kvMapping',
-    secret=dict(policyMapsecret=policyMapsecret))
-    # pass
-
 
 def main():
-    # build policy map
-    policyMap = mapKVPoliciesCGs()
-    # print (policyMap)
-    # write into vault
-    writeIntoVault(policyMap)
+    mapKVPoliciesCGs()
     #getApproverGroupEntities(management_group)
 
 if __name__ == '__main__':
