@@ -68,7 +68,7 @@ def getRequestInfo(accessor):
         if not jData['data']['approved']:
             return {
                'path': jData['data']['request_path'],
-               'entity': jData['data']['request_entity']['name'],
+               'entity': jData['data']['request_entity'].get('name', "Name not found"),
                'accessor': accessor
             }
     else:
