@@ -12,8 +12,8 @@ VAULT_TOKEN =  os.environ.get('VAULT_TOKEN', None)
 
 namespace = ""
 
-if namespace:
-    namespace+"/"
+# if namespace:
+#     namespace+"/"
 
 client = hvac.Client(
     url=VAULT_ADDRESS,

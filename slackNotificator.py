@@ -2,12 +2,17 @@ import ldap
 import os
 import slack
 import json
+import ssl
+
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 # https://github.com/slackapi/python-slackclient
 ######## connect to slack ####################################################
-client = slack.WebClient(token=os.environ['SLACK_API_TOKEN'])
+client = slack.WebClient(token=os.environ['SLACK_API_TOKEN'],ssl=ssl_context)
 ######### initialize connection ###############################################
-con = ldap.initialize('ldap://workers-0.eu-guystack.hashidemos.io:389')
+con = ldap.initialize('ldap://workers-1.eu-andrestack.hashidemos.io:389')
 # At this point, we're connected as an anonymous user
 # If we want to be associated to an account
 # you can log by binding your account details to your connection
